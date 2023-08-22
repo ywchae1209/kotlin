@@ -24,28 +24,12 @@ sealed interface SList<out A> {
 
         fun <A> of(vararg xs: A): SList<A> {
 
-            fun go(acc: SList<A>, vararg va: A): SList<A> =
+            tailrec fun go(acc: SList<A>, vararg va: A): SList<A> =
                 if(va.isEmpty()) acc
                 else go(cons( va[0], acc), *va.sliceArray(1 until va.size))
 
             return go(Nil, *xs).reverse()
         }
-
-        fun <A> fill(n: Int, a: A): SList<A> {
-
-            fun go(acc: SList<A>, i: Int): SList<A> =
-                if(i <= 0) acc
-                else go( cons( a, acc), i - 1)
-
-            return go(Nil, n)
-        }
-
-        fun <A,B,C> map2(la: SList<A>, lb: SList<B>, f: (A,B) -> C): SList<C> =
-            la.flatMap{ a ->
-                lb.map{ b ->
-                    f(a,b)
-                }
-            }
 
         ////////////////////////////////////////////////////////////////////////////////
         // utility functions
@@ -65,43 +49,40 @@ sealed interface SList<out A> {
         fun <A,B> SList<A>.foldRight(base: B,f: (A, B) -> B): B =
             this.reverse().foldLeft(base){ b, a -> f(a, b)}
 
-        fun <A> SList<A>.append(o: SList<A>): SList<A> =
-            when(this) {
-                is Nil -> o
-                is Cons -> if(o is Nil) this else cons( head, tail.append(o))
-            }
-
-        fun <A,B> SList<A>.flatMap(f: (A) -> SList<B>): SList<B> {
-            val base: SList<B> = empty()
-            return this.foldRight( { base } ) {a, b -> { f(a).append(b()) }}()
-        }
+        fun <A,B> SList<A>.flatMap(f: (A) -> SList<B>): SList<B> =
+            this.foldRight( { empty<B>()} ) {a, b -> { f(a).append(b()) }}()
 
         fun <A,B> SList<A>.map(f: (A) -> B) =
             this.flatMap{ pure(f(it)) }
 
-        fun <A,B,C> SList<A>.zipWith(ol: SList<B>, f: (A,B) -> C): SList<C> {
-            tailrec fun go(al: SList<A>, bl: SList<B>, acc: SList<C>): SList<C> =
-                if (al is Cons && bl is Cons)
-                    go( al.tail, bl.tail, cons(f(al.head, bl.head), acc))
-                else
-                    acc
-
-            return go(this, ol, Nil).reverse()
-        }
+        fun <A> SList<SList<A>>.concat(): SList<A> =
+            this.flatMap{ it }
 
         fun <A> SList<A>.filter(p: (A) -> Boolean): SList<A> =
             foldRight(empty()){ a, b -> if(p(a)) cons(a, b) else b }
 
-        tailrec fun <A> SList<A>.drop(n : Int): SList<A> =
-            when(this) {
-                is Nil -> empty()
-                is Cons -> if(n <= 0) this else tail.drop(n-1)
-            }
+        fun <A> SList<A>.all(p: (A) -> Boolean): Boolean =
+            foldLeft(true){ b, a -> b && p(a) }
 
-        tailrec fun <A> SList<A>.dropWhile(p: (A) -> Boolean): SList<A> =
-            when(this) {
-                is Nil -> empty()
-                is Cons -> if(!p(head)) this else tail.dropWhile(p)
+        fun <A> SList<A>.any(p: (A) -> Boolean): Boolean =
+            foldLeft(false){ b, a -> b || p(a) }
+
+        ////////////////////////////////////////////////////////////////////////////////
+
+        fun <A> fill(n: Int, a: A): SList<A> {
+
+            fun go(acc: SList<A>, i: Int): SList<A> =
+                if(i <= 0) acc
+                else go( cons( a, acc), i - 1)
+
+            return go(Nil, n)
+        }
+
+        fun <A,B,C> map2(la: SList<A>, lb: SList<B>, f: (A,B) -> C): SList<C> =
+            la.flatMap{ a ->
+                lb.map{ b ->
+                    f(a,b)
+                }
             }
 
         fun <A> SList<A>.take(n: Int): SList<A> {
@@ -128,12 +109,6 @@ sealed interface SList<out A> {
             return go(this, Nil).reverse()
         }
 
-        fun <A> SList<A>.all(p: (A) -> Boolean): Boolean =
-            foldLeft(true){ b, a -> b && p(a) }
-
-        fun <A> SList<A>.any(p: (A) -> Boolean): Boolean =
-            foldLeft(false){ b, a -> b || p(a) }
-
         fun <A> SList<A>.isSorted(order: (A, A) -> Boolean): Boolean {
             tailrec fun go(x: A, xs: SList<A>): Boolean =
                 when (xs) {
@@ -147,8 +122,33 @@ sealed interface SList<out A> {
             return if (this is Cons) go(head, tail) else true
         }
 
-        fun <A> SList<SList<A>>.concat(): SList<A> =
-            this.flatMap{ it }
+        fun <A> SList<A>.append(o: SList<A>): SList<A> =
+            when(this) {
+                is Nil -> o
+                is Cons -> if(o is Nil) this else cons( head, tail.append(o))
+            }
+
+        fun <A,B,C> SList<A>.zipWith(ol: SList<B>, f: (A,B) -> C): SList<C> {
+            tailrec fun go(al: SList<A>, bl: SList<B>, acc: SList<C>): SList<C> =
+                if (al is Cons && bl is Cons)
+                    go( al.tail, bl.tail, cons(f(al.head, bl.head), acc))
+                else
+                    acc
+
+            return go(this, ol, Nil).reverse()
+        }
+
+        tailrec fun <A> SList<A>.drop(n : Int): SList<A> =
+            when(this) {
+                is Nil -> empty()
+                is Cons -> if(n <= 0) this else tail.drop(n-1)
+            }
+
+        tailrec fun <A> SList<A>.dropWhile(p: (A) -> Boolean): SList<A> =
+            when(this) {
+                is Nil -> empty()
+                is Cons -> if(!p(head)) this else tail.dropWhile(p)
+            }
     }
 }
 

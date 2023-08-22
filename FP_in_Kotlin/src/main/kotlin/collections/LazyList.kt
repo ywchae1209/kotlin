@@ -75,9 +75,6 @@ sealed interface LazyList<out A> {
                 is Nil -> base()
                 is Cons -> f( head()) { tail().foldRight(base, f) }
             }
-
-
-
     }
 }
 

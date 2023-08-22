@@ -3,11 +3,7 @@ import collections.LazyList.Companion.drop
 import collections.LazyList.Companion.take
 import collections.LazyList.Companion.toSList
 import collections.SList
-import collections.SList.Companion.concat
-import collections.SList.Companion.fill
-import collections.SList.Companion.filter
 import collections.SList.Companion.flatMap
-import collections.SList.Companion.map
 import collections.SList.Companion.take
 
 fun main(args: Array<String>) {
@@ -40,4 +36,9 @@ fun main(args: Array<String>) {
     println(a.take(3))
     println(a.drop(3).toSList())
 
+    val f = {a: String, b: Int -> a.toInt() to b }
+    println(f.show)
+
 }
+val <A,B,C> ((A,C) -> B).show : String
+    get() = this.toString()

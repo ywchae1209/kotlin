@@ -14,10 +14,4 @@ object FunctionUtils {
         a:A, b:B -> f(a)(b)
     }
 
-    ////////////////////////////////////////////
-    // some magic about {} in kotlin
-    ////////////////////////////////////////////
-    fun magic() {
-
-    }
 }

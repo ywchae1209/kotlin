@@ -3,7 +3,7 @@ package collections
 import collections.SList.Companion.cons
 import collections.SList.Companion.foldRight
 
-sealed class Maybe<out A> {
+sealed interface Maybe<out A> {
 
     companion object {
         fun <A> pure(a: A): Maybe<A> = Just(a)
@@ -55,5 +55,5 @@ sealed class Maybe<out A> {
     }
 }
 
-data class Just<out A>(val get: A) : Maybe<A>()
-object None: Maybe<Nothing>()
+data class Just<out A>(val get: A) : Maybe<A>
+object None: Maybe<Nothing>

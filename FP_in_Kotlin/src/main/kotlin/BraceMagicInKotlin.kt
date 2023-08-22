@@ -110,7 +110,11 @@ object BraceMagicInKotlin {
             a.toString()
         }.then { s ->
             "this is String: $s"
-        }.then {s ->
+        }.then { s ->
             "this is second string: $s"
         }
+
+    val <A,B> ((A) -> B).show : String
+        get() = this.toString()
+
 }
