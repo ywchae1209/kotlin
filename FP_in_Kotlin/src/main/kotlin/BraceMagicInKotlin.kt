@@ -1,15 +1,17 @@
 object BraceMagicInKotlin {
 
-    // type of val ?
     ////////////////////////////////////////////////////////////////////////////////
+    // type of val ?
+
     val i_1 = 1         // Int
     val i_2 = (1)       // Int () == single expression (which is evaluated)
 
     ////////////////////////////////////////////////////////////////////////////////
+    // destructing declaration
+
     data class Person(val name: String, val age: Int, val address: String, val isStudent: Boolean )
     val p = Person("John", 11, "Earth", true)
 
-    // destructing declaration
     fun destructing_declaration(p: Person) {
         val (i,j,k,l) = p   // only-allowed in local variable.
     }
@@ -17,7 +19,8 @@ object BraceMagicInKotlin {
     ////////////////////////////////////////////////////////////////////////////////
     // meaning of { } block
     //  1. multiple expression, evaluated value is last expression.
-    //  2. {} block is not evaluated (when it is on rhs )
+    //  2. {} block is not evaluated ( when it is on rhs )
+    //  3. {} block is evaluated after other cases.
 
     val i_3 = { println("1"); 1}     // () -> Int
     val i_5 = { a: Int -> a + 1}              // (Int) -> Int
@@ -87,5 +90,27 @@ object BraceMagicInKotlin {
                 println("")
                 "above 20"
             }
+        }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// special syntax : trailing lambda
+    fun <A,B,C> andThen(f: (A) -> B, g: (B) -> C): (A) -> C = { g(f(it)) }
+
+    val composed_f = andThen({a: Int -> a.toString()}){ s -> "this is String: $s"}
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// infix version of above.
+    infix fun <A,B,C> ((A) -> B).then( g: (B) -> C): (A) -> C = { g(this(it)) }
+
+    val composed_f2 =
+        { a: Int ->
+            a.toString()
+        }.then { s ->
+            "this is String: $s"
+        }.then {s ->
+            "this is second string: $s"
         }
 }
