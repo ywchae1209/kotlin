@@ -42,12 +42,11 @@ fun main(args: Array<String>) {
     println(f.show)
 
 
-    val inf = infinite( 5 ).take(10000)
+    val inf = infinite( 5 ).take(1)
     inf.forAll{
         println(it)
         it < 7
     }
-
 }
 val <A,B,C> ((A,C) -> B).show : String
     get() = this.toString()
