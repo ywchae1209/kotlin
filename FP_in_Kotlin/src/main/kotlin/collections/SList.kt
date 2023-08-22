@@ -62,10 +62,10 @@ sealed interface SList<out A> {
             foldRight(empty()){ a, b -> if(p(a)) cons(a, b) else b }
 
         fun <A> SList<A>.all(p: (A) -> Boolean): Boolean =
-            foldLeft(true){ b, a -> b && p(a) }
+            foldLeft(true){ b, a -> p(a) && b }
 
         fun <A> SList<A>.any(p: (A) -> Boolean): Boolean =
-            foldLeft(false){ b, a -> b || p(a) }
+            foldLeft(false){ b, a -> p(a) || b}
 
         ////////////////////////////////////////////////////////////////////////////////
 

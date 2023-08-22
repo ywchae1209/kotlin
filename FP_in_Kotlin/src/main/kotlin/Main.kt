@@ -1,5 +1,7 @@
 import collections.LazyList
 import collections.LazyList.Companion.drop
+import collections.LazyList.Companion.forAll
+import collections.LazyList.Companion.infinite
 import collections.LazyList.Companion.take
 import collections.LazyList.Companion.toSList
 import collections.SList
@@ -38,6 +40,13 @@ fun main(args: Array<String>) {
 
     val f = {a: String, b: Int -> a.toInt() to b }
     println(f.show)
+
+
+    val inf = infinite( 5 ).take(10000)
+    inf.forAll{
+        println(it)
+        it < 7
+    }
 
 }
 val <A,B,C> ((A,C) -> B).show : String

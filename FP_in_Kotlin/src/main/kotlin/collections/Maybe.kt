@@ -4,9 +4,10 @@ import collections.SList.Companion.cons
 import collections.SList.Companion.foldRight
 
 sealed interface Maybe<out A> {
+    val isEmpty: Boolean
 
     companion object {
-        fun <A> pure(a: A): Maybe<A> = Just(a)
+        fun <A> just(a: A): Maybe<A> = Just(a)
         fun <A> none(): Maybe<A> = None
 
         fun <A,B> lift(f: (A) -> B): (Maybe<A>) -> Maybe<B> = {
@@ -15,7 +16,7 @@ sealed interface Maybe<out A> {
         
         fun <A> maybe(a: () -> A, logger: (String) -> Unit = {}): Maybe<A> =
             try {
-                pure(a())
+                just(a())
             } catch (e: Throwable) {
                 logger(e.stackTraceToString())
                 none()
@@ -32,7 +33,7 @@ sealed interface Maybe<out A> {
             fold( { none() } ){ f(it) }
 
         fun <A,B> Maybe<A>.map(f: (A) -> B): Maybe<B> =
-            flatMap{ pure(f(it)) }
+            flatMap{ just(f(it)) }
 
         fun <A,B,C> map2(oa: Maybe<A>, ob: Maybe<B>, f: (A, B) -> C) =
             oa.flatMap { a ->
@@ -55,5 +56,9 @@ sealed interface Maybe<out A> {
     }
 }
 
-data class Just<out A>(val get: A) : Maybe<A>
-object None: Maybe<Nothing>
+data class Just<out A>(val get: A) : Maybe<A> {
+    override val isEmpty: Boolean = false
+}
+object None: Maybe<Nothing> {
+    override val isEmpty: Boolean = true
+}
