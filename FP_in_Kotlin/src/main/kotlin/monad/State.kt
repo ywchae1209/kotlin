@@ -8,8 +8,10 @@ import collections.SList.Companion.map
 import monad.State.Companion.sequence
 
 import monad.CoinMachine.simulateMachine
-import monad.Random.random_Ints
+import monad.Random.gen_Ints
 import monad.State.Companion.get
+import monad.State.Companion.map2
+import kotlin.math.abs
 
 data class State<S, out A>(val run: (S) -> Pair<A, S>) {
 
@@ -69,12 +71,14 @@ object Random {
         }
     }
 
-    private fun gen_Int() : State<RNG, Int> = State{ it.nextInt() }
-    private fun gen_ints(n: Int) = SList.fill(n, Unit).map{ _ -> gen_Int()}.sequence()
+    private fun int() : State<RNG, Int> = State{ it.nextInt() }
+    private fun double()  = int().map{ it / Int.MAX_VALUE.toDouble() + 1}
+    private fun ints(n: Int) = SList.fill(n, Unit).map{ _ -> int()}.sequence()
+    private fun int_double() = map2( int(), double()){ a, b -> a to b}
+    private fun int_Abs() = int().map{ abs( it) }
 
-    fun random_Ints( n: Int, seed: Long = 12345L) =
-        gen_ints(n).run(SimpleRNG(seed)).first
-
+    fun gen_Ints(n: Int, seed: Long = 12345L) =
+        ints(n).run(SimpleRNG(seed)).first
 
 }
 
@@ -120,7 +124,7 @@ object CoinMachine {
 /// CoinMachine example
 fun main(args: Array<String>) {
 
-    val ints = random_Ints(100)
+    val ints = gen_Ints(100)
 
     val inputs = ints.map{ if(0 == it % 2) CoinMachine.Coin else CoinMachine.Turn }
     println(inputs)
