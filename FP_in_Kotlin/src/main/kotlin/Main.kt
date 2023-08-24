@@ -47,6 +47,41 @@ fun main(args: Array<String>) {
         println(it)
         it < 7
     }
+
+    val g1 = OperatorExample.from("1111")
+    val g2 = OperatorExample.from("2222")
+
+    g1("b")
+    val z2 =g1 - g2
+    val z1 =g1 + g2
 }
+
 val <A,B,C> ((A,C) -> B).show : String
     get() = this.toString()
+
+interface OperatorExample {
+    operator fun invoke(s: String) : String
+    operator fun minus(o: OperatorExample): OperatorExample
+    operator fun plus(o: OperatorExample): OperatorExample
+
+    companion object {
+        fun from(st: String): OperatorExample =
+            object : OperatorExample {
+                override fun invoke(s: String): String {
+                    val ret = "called: $st\t$s"
+                    println(ret)
+                    return ret
+                }
+
+                override fun minus(o: OperatorExample): OperatorExample {
+                    println("minus")
+                    return o
+                }
+
+                override fun plus(o: OperatorExample): OperatorExample {
+                    println("plus")
+                    return this
+                }
+            }
+    }
+}

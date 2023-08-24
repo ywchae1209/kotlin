@@ -1,16 +1,16 @@
-package monad
+package state
 
 import collections.SList
 import collections.SList.Companion.cons
 import collections.SList.Companion.empty
 import collections.SList.Companion.foldRight
 import collections.SList.Companion.map
-import monad.State.Companion.sequence
+import state.State.Companion.sequence
 
-import monad.CoinMachine.simulateMachine
-import monad.Random.gen_Ints
-import monad.State.Companion.get
-import monad.State.Companion.map2
+import state.CoinMachine.simulateMachine
+import state.Random.gen_Ints
+import state.State.Companion.get
+import state.State.Companion.map2
 import kotlin.math.abs
 
 data class State<S, out A>(val run: (S) -> Pair<A, S>) {
@@ -124,16 +124,20 @@ object CoinMachine {
 /// CoinMachine example
 fun main(args: Array<String>) {
 
-    val ints = gen_Ints(100)
+    val size = 100
+    val coins = 30
+    val candies = 30
+
+    val ints = gen_Ints(size)
 
     val inputs = ints.map{ if(0 == it % 2) CoinMachine.Coin else CoinMachine.Turn }
-    println(inputs)
+    println( "input scenario : size = $size : $inputs")
 
-    val init = CoinMachine.Machine( true, 30, 30)
-    println(init)
+    val init = CoinMachine.Machine( true, candies, coins)
+    println( "Candy Machine Initial State : $init")
 
     val result = simulateMachine(inputs).run(init)
-    println("(coin, candy)   = ${result.first}")
-    println("(machine state) = ${result.second}")
 
+    println("::: Last result after simulation :::" +
+            "(machine state) = ${result.second}")
 }
