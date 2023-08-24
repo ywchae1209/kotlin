@@ -40,9 +40,11 @@ sealed interface SList<out A> {
                 is Cons -> this.tail.foldLeft( f(base, this.head), f)
             }
 
+        fun <A> SList<A>.head(): A = if( this is Cons) head else throw Exception("head on Nil")
+
         fun <A> SList<A>.isEmpty(): Boolean = (this is Nil)
 
-        fun <A> SList<A>.length(): Int = foldLeft(0){b, _ -> b + 1}
+        fun <A> SList<A>.size(): Int = foldLeft(0){b, _ -> b + 1}
 
         fun <A> SList<A>.reverse(): SList<A> = this.foldLeft( empty<A>()) { b, a -> cons(a, b) }
 
